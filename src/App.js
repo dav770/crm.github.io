@@ -55,7 +55,9 @@ constructor(props) {
       auth: 0, //0=a refaire, 1=true, 2=false
       origine: '/',
       level:0,
-      actif:true
+      actif:true,
+      confirmPwd:'',
+      comment:'',
   }
  
 }

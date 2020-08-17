@@ -2,6 +2,7 @@ const express = require('express');
 const moment = require('moment');
 const mysql = require('mysql');
 var bodyParser = require('body-parser')
+var upload = multer({ dest: 'uploads/' })
 
 
 const app = express();
@@ -108,6 +109,55 @@ console.log('retour sql 2', err, typeof rows );
 
 app.post('/Signup', (req, res) => {
   const table ='account';
+  console.log('post', JSON.stringify(req.body));
+  pool.query(`insert into ${table} 
+              (Nom, email, MdP, rememberMe, idLevel, dateAccount, activeAccount) 
+              values (${JSON.stringify(req.body.user)}, 
+              ${JSON.stringify(req.body.email)}, 
+              ${JSON.stringify(req.body.pwd)},
+              ${JSON.stringify(req.body.rememberMe)},
+              0,
+              '${date.toString()}',
+              0)`, (err, rows) => {
+console.log('retour sql 2', err, typeof rows );
+
+    if (err) {
+      res.send(err.sqlMessage);
+    } else {
+      res.send(rows);
+    }
+  });
+});
+
+
+app.post('/update/user', (req, res) => {
+// verifier valeur et nom actif
+
+  const table ='account';
+  console.log('post', JSON.stringify(req.body));
+  pool.query(`Update ${table} 
+              Set 
+              Nom = ${JSON.stringify(req.body.user)}, 
+              email = ${JSON.stringify(req.body.email)}, 
+              MdP = ${JSON.stringify(req.body.pwd)},
+              rememberMe = ${JSON.stringify(req.body.rememberMe)},
+              idLevel = ${JSON.stringify(req.body.level)},
+              activeAccount =  ${JSON.stringify(req.body.actif)}
+              WHERE email = ${JSON.stringify(req.body.email)}`, 
+              (err, rows) => {
+console.log('retour sql 2', err, typeof rows );
+
+    if (err) {
+      res.send(err.sqlMessage);
+    } else {
+      res.send(rows);
+    }
+  });
+});
+
+app.post('/update/agent', (req, res) => {
+
+  const table ='agents';
   console.log('post', JSON.stringify(req.body));
   pool.query(`insert into ${table} 
               (Nom, email, MdP, rememberMe, idLevel, dateAccount, activeAccount) 
