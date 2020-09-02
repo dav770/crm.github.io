@@ -61,6 +61,7 @@ cancelLevel = 0
 cancelActif = false
 cancelComment = ''
 
+keyAes = 'key of secure aes256';
 
 handleCancel = ()=>{
    
@@ -182,9 +183,11 @@ handleCancel = ()=>{
   _submitForm = e => {
     e.preventDefault();
 
+    const resPwd = ""
     const resUser = Verify.length(this.myRefUser.current);
     const resEmail = Verify.email(this.myRefEmail.current);
-    if (this.state.warnPwd && this.state.userOpen.pwd !== '') const resPwd = Verify.password(this.myRefPwd.current);
+
+    if (this.state.warnPwd && this.state.userOpen.pwd !== '') {resPwd = Verify.password(this.myRefPwd.current)};
 
 
     
@@ -197,7 +200,10 @@ handleCancel = ()=>{
       this.myRefPwd.current.props.value ===
         this.myRefConfirmPwd.current.props.value
     ) {
-// appel axios
+// appel axios via CallApi
+        CallApi.AxiosApi('/update/user', this.state.userOpen);
+
+
 // renvoi du state m a j vers app.js
 // enregistrement du avatar dans publis/asset/img
 

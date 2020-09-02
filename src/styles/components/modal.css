@@ -1,0 +1,34 @@
+.modal-content{
+    width: 150%;
+}
+
+.form-control{
+    width: 300px;
+}
+
+.input-small{
+    width: 150px;
+}
+
+.input-medium{
+    width: 250px;
+}
+
+input[type="datetime-local"]{
+    width: 180px;
+}
+
+.label-details{
+    margin-right: 3%;
+}
+.input-details{
+    margin-right: 5%;
+}
+
+.card-agent{
+    width: 22%;
+    margin-right: 52%;
+    display: block;
+    text-align: center;
+
+}

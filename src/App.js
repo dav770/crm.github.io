@@ -5,7 +5,7 @@ import PageSpinner from 'components/PageSpinner';
 import AuthPage from 'pages/AuthPage';
 import React from 'react';
 import componentQueries from 'react-component-queries';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch, NavLink } from 'react-router-dom';
 import './styles/reduction.scss';
 
 import aes256 from 'aes256'
@@ -14,6 +14,11 @@ import aes256 from 'aes256'
 
 import Profile from './components/Profile';
 import TestCp from './components/TestCp';
+
+import {isEmpty} from "lodash"
+import ListeAgents from './pages/ListeAgents';
+import ListeCommerciaux from './pages/ListeCommerciaux';
+import Clients from './pages/Clients';
 // const Profile = React.lazy(() => import('components/Profile'));
 
 const AlertPage = React.lazy(() => import('pages/AlertPage'));
@@ -48,17 +53,19 @@ constructor(props) {
 
   this.state = {
   user:'',
-      email: '',
-      pwd:'',
-      rememberMe: '',
+      email: 'demo@gmail.com',
+      pwd:aes256.encrypt(this.keyAes, 'demoPwd770@'),
+      rememberMe: true,
       validate: aes256.encrypt(this.keyAes,'date of day'),
-      auth: 0, //0=a refaire, 1=true, 2=false
+      auth: 1, //0=a refaire, 1=true, 2=false
       origine: '/',
       level:0,
       actif:true,
       confirmPwd:'',
       comment:'',
   }
+
+
  
 }
 
@@ -79,21 +86,23 @@ keyAes = 'key of secure aes256'
 componentDidMount() {
   console.log(' monte');
   
+  
+  this.verifRedirect()
 }
 
 
 
 
 verifRedirect = ()=>{
-  
+  console.log('rentre dans verif', this.state)
 
-  this.auth = false //ouverture de l 'appli doit etre proteger pour eviter navigation depuis url sans etre authentifie
+  this.auth = 0 //ouverture de l 'appli doit etre proteger pour eviter navigation depuis url sans etre authentifie
 
   this.getStorage = localStorage.getItem('userActif')
   this.validateStorage = ''
  
  
-   if (this.getStorage === null){
+   if (this.getStorage === null || isEmpty(this.getStorage)){
     const storage = {
       user: this.state.user,
       email: this.state.email,
@@ -108,15 +117,17 @@ verifRedirect = ()=>{
      this.validateStorage = JSON.parse(this.getStorage)
    }
 
-   console.log('sub',aes256.decrypt(this.keyAes, this.validateStorage.validate) === this.dateConnect.getDate().toString()+this.dateConnect.getMonth().toString()+this.dateConnect.getFullYear().toString())
+   console.log('comparaison verif',aes256.decrypt(this.keyAes, this.validateStorage.validate) === this.dateConnect.getDate().toString()+this.dateConnect.getMonth().toString()+this.dateConnect.getFullYear().toString())
    if( aes256.decrypt(this.keyAes, this.validateStorage.validate) === this.dateConnect.getDate().toString()+this.dateConnect.getMonth().toString()+this.dateConnect.getFullYear().toString()){
      this.setState({user:this.validateStorage.user, email:this.validateStorage.email, level:0 , auth: 1, origine:''})
 
      
    }else{
-    this.setState({auth: 2})
+    this.setState({auth: 2},()=>{console.log('sort de verif', this.state)})
     
    }
+
+   
 
 }
 
@@ -125,20 +136,35 @@ verifRedirect = ()=>{
 dateConnect = new Date()
 
 
+
+
+
+
   render() {
     
+    
     // origine === '/' lancement de l'appli
-    console.log('app 0', this.state)
+    
+// remttre
 
-if (this.state.origine === '/' && this.state.auth === 0){
-  this.verifRedirect()
-}
+// if (this.state.origine === '/' && this.state.auth === 0){
+//   console.log('lancement de  l app', this.state)
+//   this.verifRedirect()
+// }
+
+
 
     return (
       <BrowserRouter basename={getBasename()}>
+
+
+
+      
         <GAListener>
           <Switch>
-            <LayoutRoute
+
+
+<LayoutRoute
               exact
               path="/login"
               layout={EmptyLayout}
@@ -155,8 +181,8 @@ if (this.state.origine === '/' && this.state.auth === 0){
               )}
             />
 
-{console.log('app 1', this.state.auth)}
-{(this.state.auth !== 1 ) && <Redirect to='/login'/>}
+{/* remttre */}
+{/* {(this.state.auth === 2 ) && <Redirect to='/login'/>} */}
 
 
 
@@ -165,6 +191,10 @@ if (this.state.origine === '/' && this.state.auth === 0){
 
                 <Route exact path="/" component={DashboardPage} />
                 <Route path="/profile" component={()=>(<Profile userOpen={this.state}/>)}></Route>
+                {/* <Route path="/agents" component={()=>(<Agents userOpen={this.state}/>)}></Route> */}
+                <Route path="/agents" component={()=>(<ListeAgents userOpen={this.state}/>)}></Route>
+                <Route path="/commerciaux" component={()=>(<ListeCommerciaux userOpen={this.state}/>)}></Route>
+                <Route path="/clients" component={()=>(<Clients userOpen={this.state}/>)}></Route>
                 
               </React.Suspense>
             </MainLayout>

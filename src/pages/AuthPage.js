@@ -4,10 +4,10 @@ import { Card, Col, Row } from 'reactstrap';
 
 class AuthPage extends React.Component {
 
- 
+
 
   handleAuthState = authState => {
-
+    
     
     if (authState === STATE_LOGIN) {
       this.props.history.push('/login');
@@ -21,7 +21,7 @@ class AuthPage extends React.Component {
   };
 
   render() {
-    // console.log('sign pg props', this.props)
+    console.log('j ai ete redirige', this.props)
     return (
       <Row
         style={{
