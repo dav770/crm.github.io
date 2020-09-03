@@ -160,6 +160,9 @@ class AgentsDetails extends Component {
     this.setState({ valueTabs: newValue });
   };
 
+// fonctions a adapter
+
+
   // handleEdit = (ev, id, obj, ref) => {
   //   this.setState((prevState, prevprops) => {
   //     return {
@@ -697,7 +700,7 @@ class AgentsDetails extends Component {
             </Form>
           )}
           {this.state.valueTabs === 3 && (
-            <ClientMap adress1={this.state.newClient.adresse} ville1={this.state.newClient.ville} cp1={this.state.newClient.cp}></ClientMap>
+            <ClientMap address1={this.state.newClient.adresse} ville1={this.state.newClient.ville} cp1={this.state.newClient.cp}></ClientMap>
             
           )}
           {this.state.valueTabs === 4 && (

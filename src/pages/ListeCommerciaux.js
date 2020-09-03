@@ -3,7 +3,6 @@ import React, { Component, Fragment } from 'react';
 import aes256 from 'aes256';
 import * as CallApi from '../components/api/CallApi';
 
-
 import {
   Alert,
   Input,
@@ -52,19 +51,17 @@ class ListeCommerciaux extends Component {
       prevName: '',
       prevTel1: '',
       prevTel2: '',
-      
+
       warnMessage: '',
     };
 
     this.refModal = createRef();
-    
+
     this.refModalTel1 = createRef();
     this.refModalTel2 = createRef();
     this.refModalName = createRef();
-    
-    this.refModalToggle = createRef();
 
-    
+    this.refModalToggle = createRef();
   }
 
   optionsAlerte = {
@@ -73,12 +70,12 @@ class ListeCommerciaux extends Component {
     buttons: [
       {
         label: 'Yes',
-        onClick: () => alert('Click Yes')
+        onClick: () => alert('Click Yes'),
       },
       {
         label: 'No',
-        onClick: () => alert('Click No')
-      }
+        onClick: () => alert('Click No'),
+      },
     ],
     childrenElement: () => <div />,
     customUI: ({ onClose }) => <div>Custom UI</div>,
@@ -87,23 +84,20 @@ class ListeCommerciaux extends Component {
     willUnmount: () => {},
     afterClose: () => {},
     onClickOutside: () => {},
-    onKeypressEscape: () => {}
+    onKeypressEscape: () => {},
   };
 
-  
-
-  notify = (message) => {
-
+  notify = message => {
     toast(message, {
-    position: "top-center",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
     });
-  }
+  };
 
   toggle = modalType => e => {
     console.log('toogle', modalType, e);
@@ -123,10 +117,10 @@ class ListeCommerciaux extends Component {
   keyAes = 'key of secure aes256';
 
   async componentDidMount() {
-    this.refreshData()
+    this.refreshData();
   }
 
-  async refreshData(){
+  async refreshData() {
     var res = await this.callApiRequest('commercial', this.storage, [], 'post');
     this.state.agents = res;
     console.log('push', res);
@@ -138,36 +132,35 @@ class ListeCommerciaux extends Component {
   async callApiRequest(dest, storage, params, verbeHttp) {
     var arrayData = [];
 
-    if(verbeHttp === 'post'){
+    if (verbeHttp === 'post') {
       var respData = await CallApi.AxiosApi(dest, storage, params);
-    return new Promise(resolve => {
-      if (typeof respData === 'string') {
-        arrayData = [true, respData];
-      } else {
-        arrayData = [false, respData];
-      }
+      return new Promise(resolve => {
+        if (typeof respData === 'string') {
+          arrayData = [true, respData];
+        } else {
+          arrayData = [false, respData];
+        }
 
-      return resolve(respData);
-    });
-    }else{
+        return resolve(respData);
+      });
+    } else {
       var respData = await CallApi.AxiosApiGet(dest, storage, params);
-    return new Promise(resolve => {
-      if (typeof respData === 'string') {
-        arrayData = [true, respData];
-      } else {
-        arrayData = [false, respData];
-      }
+      return new Promise(resolve => {
+        if (typeof respData === 'string') {
+          arrayData = [true, respData];
+        } else {
+          arrayData = [false, respData];
+        }
 
-      return resolve(respData);
-    });
-  }
-    
+        return resolve(respData);
+      });
+    }
   }
 
   handleEdit = (ev, id, obj, ref) => {
     obj.id = id;
 
-    console.log('type of', typeof id)
+    console.log('type of', typeof id);
     this.setState((prevState, prevprops) => {
       return {
         edit: true,
@@ -176,16 +169,15 @@ class ListeCommerciaux extends Component {
         prevName: obj.nom,
         prevTel1: obj.tel1,
         prevTel2: obj.tel2,
-        
       };
     });
 
     ref.current.click();
   };
 
-  handleDelete (ev, id, refTel1) {
+  handleDelete(ev, id, refTel1) {
     console.log('delete', ev.target, id, refTel1);
-    
+
     confirmAlert({
       title: `Confirm to delete a commercial id : ${id}`,
       message: 'Are you sure to do this.',
@@ -195,29 +187,25 @@ class ListeCommerciaux extends Component {
           onClick: () => {
             this.callApiRequest('delete', 'commercial', [id, refTel1]);
             setTimeout(() => {
-              
-    this.refreshData()
+              this.refreshData();
             }, 2000);
-          }
+          },
         },
         {
           label: 'Cancel',
-          onClick: () => {}
-        }
-      ]
+          onClick: () => {},
+        },
+      ],
     });
-
-
-  };
+  }
 
   handleChange = (ev, refField) => {
     let agent = this.state.agent;
     let error = false;
-var res = ''
+    var res = '';
     if (ev.target.name === 'name') {
-      
-      res = this.verifData('name', ev.target.value, refField)
-      console.log('change 1',res, ev.target.value, refField);
+      res = this.verifData('name', ev.target.value, refField);
+      console.log('change 1', res, ev.target.value, refField);
       if (res === '') {
         agent.nom = ev.target.value;
       } else {
@@ -225,7 +213,6 @@ var res = ''
         error = true;
       }
     }
-
 
     if (ev.target.name === 'tel1') {
       agent.level = ev.target.value;
@@ -238,13 +225,12 @@ var res = ''
     // sinon on le remet a ''
     //  submit ne pourra se faire que si warnMessage === ''
 
-    
     if (!error) {
       this.setState(() => {
         return { agent, warnMessage: '' };
       });
     } else {
-      this.notify(res)
+      this.notify(res);
       this.setState(() => {
         return { agent };
       });
@@ -257,7 +243,6 @@ var res = ''
     var resPwd = {};
 
     if (app === 'name') {
-      
       resUser = Verify.length(refData.current, data);
     }
     if (app === 'email') {
@@ -266,8 +251,6 @@ var res = ''
     if (app === 'pwd') {
       resPwd = Verify.password(refData.current, data);
     }
-
-    
 
     if (resUser.err) {
       // toast et retour
@@ -288,7 +271,6 @@ var res = ''
       return resPwd.message;
     }
 
-    
     return '';
   };
 
@@ -307,28 +289,24 @@ var res = ''
   _submitForm = (e, ref) => {
     e.persist();
     e.preventDefault();
-    
+
     if (this.state.warnMessage === '') {
-     
-      
-    CallApi.AxiosApi('update/user', 'commercial', this.state.agent);
-    ref.current.onClick();
+      CallApi.AxiosApi('update/user', 'commercial', this.state.agent);
+      ref.current.onClick();
 
-
-    this.refreshData()
+      this.refreshData();
     }
-    
   };
 
   render() {
-    var disabledField = '' //this.state.edit ? 'disabled' : '';
+    var disabledField = ''; //this.state.edit ? 'disabled' : '';
 
     console.log('state', this.state);
     return (
       <div>
         <Fragment>
           <ToastContainer />
-          
+
           <Modal
             isOpen={this.state.modal}
             toggle={this.toggle()}
@@ -389,7 +367,6 @@ var res = ''
                     />
                   </Col>
                 </FormGroup>
-           
               </ModalBody>
               <ModalFooter>
                 <Button type="submit" color="primary">
@@ -414,7 +391,6 @@ var res = ''
               <th>Nom</th>
               <th>Tel1</th>
               <th>Tel2</th>
-              
             </tr>
           </thead>
 
@@ -424,87 +400,84 @@ var res = ''
                 {console.log('id', this.state.id === agent.idCommercial)}
                 <td>{agent.idCommercial}</td>
                 <td>
-               
-                    <input
-                      type="text"
-                      style={{ border: 'none' }}
-                      disabled={true}
-                      value={agent.nom}
-                    />
-                  
+                  <input
+                    type="text"
+                    style={{ border: 'none' }}
+                    disabled={true}
+                    value={agent.nom}
+                  />
                 </td>
                 <td>
-               
-                    <input
-                    
-                      type="text"
-                      style={{ border: 'none' }}
-                      disabled={true}
-                      value={agent.tel1}
-                    />
-                  
+                  <input
+                    type="text"
+                    style={{ border: 'none' }}
+                    disabled={true}
+                    value={agent.tel1}
+                  />
                 </td>
                 <td>
-               
-                    <input
-                    
-                      type="text"
-                      style={{ border: 'none' }}
-                      disabled={true}
-                      value={agent.tel2}
-                    />
-                  
+                  <input
+                    type="text"
+                    style={{ border: 'none' }}
+                    disabled={true}
+                    value={agent.tel2}
+                  />
                 </td>
-                
-                
-                  <Fragment>
-                    <td>
-                      <button
-                        disabled={disabledField}
-                        className="btn btn-sm btn-primary"
-                        onClick={e =>
-                          this.handleEdit(
-                            e,
-                            agent.idCommercial,
-                            {
-                              nom: agent.nom,
-                              tel1: agent.tel1,
-                              tel2: agent.tel2,
-                            },
-                            this.refModal,
-                          )
-                        }
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td>
+
+                <Fragment>
+                  <td>
+                    <button
+                      disabled={disabledField}
+                      className="btn btn-sm btn-primary"
+                      onClick={e =>
+                        this.handleEdit(
+                          e,
+                          agent.idCommercial,
+                          {
+                            nom: agent.nom,
+                            tel1: agent.tel1,
+                            tel2: agent.tel2,
+                          },
+                          this.refModal,
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+                  </td>
+                  <td>
                     {/* bouton qui declenche le modal il sans bord et fond pour etre invisible juste invoque par handleEdit qui recupere son ref */}
-                      <button
-                        disabled={disabledField}
-                        className="btn btn-sm btn-primary"
-                        ref={this.refModal}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          fontSize: 0,
-                        }}
-                        onClick={this.toggle()}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        disabled={disabledField}
-                        className="btn btn-sm btn-danger"
-                        onClick={e => this.handleDelete(e, agent.idCommercial,agent.tel1 , confirmAlert(this.optionsAlerte))}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </Fragment>
-                
+                    <button
+                      disabled={disabledField}
+                      className="btn btn-sm btn-primary"
+                      ref={this.refModal}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        fontSize: 0,
+                      }}
+                      onClick={this.toggle()}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      disabled={disabledField}
+                      className="btn btn-sm btn-danger"
+                      onClick={e =>
+                        this.handleDelete(
+                          e,
+                          agent.idCommercial,
+                          agent.tel1,
+                          confirmAlert(this.optionsAlerte),
+                        )
+                      }
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </Fragment>
               </tr>
             ))}
           </tbody>
