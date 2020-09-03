@@ -660,3 +660,24 @@ suppClient
     },
   );
 });
+
+
+
+app.post('/planing', (req, res) => {
+  // const table = req.body.
+  console.log('post planing', req.body);
+
+  connection.query(
+    `SELECT p.*, cli.nom as Client, c.nom as Commercial FROM ${req.body.table}`,
+    (err, rows) => {
+      // console.log('retour sql 2', err, typeof rows);
+
+      if (err) {
+        res.send(err.sqlMessage);
+      } else {
+        
+        res.send(rows);
+      }
+    },
+  );
+});
