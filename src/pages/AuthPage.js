@@ -4,7 +4,9 @@ import { Card, Col, Row } from 'reactstrap';
 
 class AuthPage extends React.Component {
 
-
+  recieveAuth=(auth)=>{
+this.props.callBackLogin(auth)
+  }
 
   handleAuthState = authState => {
     
@@ -35,6 +37,7 @@ class AuthPage extends React.Component {
               authState={this.props.authState}
               onChangeAuthState={this.handleAuthState}
               onLogoClick={this.handleLogoClick}
+              callBackAuth={this.recieveAuth}
             />
           </Card>
         </Col>

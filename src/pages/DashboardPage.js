@@ -44,6 +44,10 @@ import {
 } from 'reactstrap';
 import { getColor } from 'utils/colors';
 
+
+
+import * as CallApi from '../components/api/CallApi';
+
 const today = new Date();
 const lastWeek = new Date(
   today.getFullYear(),
@@ -51,10 +55,53 @@ const lastWeek = new Date(
   today.getDate() - 7,
 );
 
+
+
+
 class DashboardPage extends React.Component {
-  componentDidMount() {
+
+  agentProgressTableData =[]
+  respData = []
+
+  async componentDidMount() {
     // this is needed, because InfiniteCalendar forces window scroll
     window.scrollTo(0, 0);
+
+    this.respData = await this.callApiRequest('agents', [], [], 'post') 
+    
+
+
+if(this.respData.length > 0){
+  
+  this.respData.map(agent=>{
+
+  this.agentProgressTableData.push({
+    avatar: '/asset/img/avatar.png',
+    name: agent.nom,
+    date: '2 hour ago',
+    progress: Math.floor(Math.random() * Math.floor(100)),
+  } )
+})
+
+
+this.forceUpdate()
+}
+
+
+
+
+
+  }
+
+  async callApiRequest (dest, storage, params, verbeHttp){
+    if (verbeHttp === 'post') {
+      var respData = await CallApi.AxiosApi(dest, storage, params);
+    }else{
+      var respData = await CallApi.AxiosApiGet(dest, storage, params);
+    }
+     console.log('retour dash API', respData);
+    return respData
+   
   }
 
   render() {
@@ -208,7 +255,7 @@ class DashboardPage extends React.Component {
 
           <Col md="6" sm="12" xs="12">
             <Card>
-              <CardHeader>New Users</CardHeader>
+              <CardHeader>Agents Progress</CardHeader>
               <CardBody>
                 <UserProgressTable
                   headers={[
@@ -218,7 +265,7 @@ class DashboardPage extends React.Component {
                     'participation',
                     '%',
                   ]}
-                  usersData={userProgressTableData}
+                  usersData={this.agentProgressTableData}
                 />
               </CardBody>
             </Card>
@@ -248,7 +295,7 @@ class DashboardPage extends React.Component {
                 style={{ position: 'absolute' }}
               >
                 <CardTitle>
-                  <MdInsertChart /> Sales
+                  <MdInsertChart /> PRED
                 </CardTitle>
               </CardBody>
             </Card>
@@ -276,7 +323,7 @@ class DashboardPage extends React.Component {
                 style={{ position: 'absolute' }}
               >
                 <CardTitle>
-                  <MdInsertChart /> Revenue
+                  <MdInsertChart /> ROBOT
                 </CardTitle>
               </CardBody>
             </Card>
@@ -303,7 +350,7 @@ class DashboardPage extends React.Component {
                 style={{ position: 'absolute', right: 0 }}
               >
                 <CardTitle>
-                  <MdInsertChart /> Profit
+                  <MdInsertChart /> LEAD
                 </CardTitle>
               </CardBody>
             </Card>
@@ -347,61 +394,7 @@ class DashboardPage extends React.Component {
           </Col>
         </Row>
 
-        <CardDeck style={{ marginBottom: '1rem' }}>
-          <Card body style={{ overflowX: 'auto','paddingBottom':'15px','height': 'fit-content','paddingTop': 'inherit'}}>
-            <HorizontalAvatarList
-              avatars={avatarsData}
-              avatarProps={{ size: 50 }}
-            />
-          </Card>
-
-          <Card body style={{ overflowX: 'auto','paddingBottom':'15px','height': 'fit-content','paddingTop': 'inherit'}}>
-            <HorizontalAvatarList
-              avatars={avatarsData}
-              avatarProps={{ size: 50 }}
-              reversed
-            />
-          </Card>
-        </CardDeck>
-
-        <Row>
-          <Col lg="4" md="12" sm="12" xs="12">
-            <AnnouncementCard
-              color="gradient-secondary"
-              header="Announcement"
-              avatarSize={60}
-              name="Jamy"
-              date="1 hour ago"
-              text="Lorem ipsum dolor sit amet,consectetuer edipiscing elit,sed diam nonummy euismod tinciduntut laoreet doloremagna"
-              buttonProps={{
-                children: 'show',
-              }}
-              style={{ height: 500 }}
-            />
-          </Col>
-
-          <Col lg="4" md="12" sm="12" xs="12">
-            <Card>
-              <CardHeader>
-                <div className="d-flex justify-content-between align-items-center">
-                  <span>Support Tickets</span>
-                  <Button>
-                    <small>View All</small>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardBody>
-                {supportTicketsData.map(supportTicket => (
-                  <SupportTicket key={supportTicket.id} {...supportTicket} />
-                ))}
-              </CardBody>
-            </Card>
-          </Col>
-
-          <Col lg="4" md="12" sm="12" xs="12">
-            <TodosCard todos={todosData} />
-          </Col>
-        </Row>
+        
       </Page>
     );
   }
