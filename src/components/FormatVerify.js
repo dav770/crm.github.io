@@ -1,7 +1,9 @@
 
 
 export function email (e, data){
-if(data !== '' && data !== null){
+    
+if(data !== '' && data !== null && data !== undefined){
+    
     let lastAtPos = data.lastIndexOf("@");
     let lastDotPos = data.lastIndexOf(".");
 
@@ -39,7 +41,7 @@ export function password(e, data){
     // const minimunCase = new RegExp("^(? =. {8,})")
     const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
 
-    if(data !== '' && data !== null){
+    if(data !== '' && data !== null && data !== undefined){
 
         if (strongRegex.test(data)){
             return {err: false, message: ''};
@@ -60,7 +62,7 @@ export function password(e, data){
 
 export function length(e, data){
     console.log('dans verif length',data.length, data);
-    if(data !== '' && data !== null){
+    if(data !== '' && data !== null && data !== undefined){
         if (data.length < 3) {
             console.log('dans verif length',e);
               return {err: true, message: 'le nom doit contenir au moins 6 caracteres'};

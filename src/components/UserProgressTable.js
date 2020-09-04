@@ -40,6 +40,8 @@ const UserProgressTable = ({ headers, usersData, ...restProps }) => {
 };
 
 UserProgressTable.propTypes = {
+  pagesCount: PropTypes.number.isRequired,
+ currentPage: PropTypes.number.isRequired,
   headers: PropTypes.node,
   usersData: PropTypes.arrayOf(
     PropTypes.shape({
