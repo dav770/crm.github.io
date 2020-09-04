@@ -15,13 +15,12 @@ import * as CallApi from './api/CallApi';
 
 import * as Verify from './FormatVerify';
 
-
 // import Cryptr from 'cryptr';
 // const cryptr = new Cryptr('myTotalySecretKey');
- 
+
 // const encryptedString = cryptr.encrypt('bacon');
 // const decryptedString = cryptr.decrypt('mjhfksdjh');
- 
+
 // console.log('000',encryptedString); // e7b75a472b65bc4a42e7b3f78833a4d00040beba796062bf7c13d9533b149e5ec3784813dc20348fdf248d28a2982df85b83d1109623bce45f08238f6ea9bd9bb5f406427b2a40f969802635b8907a0a57944f2c12f334bd081d5143a357c173a611e1b64a
 // console.log('1111',decryptedString); // bacon
 
@@ -38,11 +37,11 @@ class AuthForm extends React.Component {
       confirmPwd: '',
       rememberMe: false,
       validate: aes256.encrypt(
-            this.keyAes,
-            this.dateConnect.getDate().toString() +
-              this.dateConnect.getMonth().toString() +
-              this.dateConnect.getFullYear().toString(),
-          ),
+        this.keyAes,
+        this.dateConnect.getDate().toString() +
+          this.dateConnect.getMonth().toString() +
+          this.dateConnect.getFullYear().toString(),
+      ),
       codeAuth: '',
       submited: false,
     };
@@ -94,9 +93,6 @@ class AuthForm extends React.Component {
     this.props.onChangeAuthState(authState);
   };
 
-
-
-
   storage = {
     user: 'NC',
     email: '',
@@ -105,12 +101,13 @@ class AuthForm extends React.Component {
     validate: '',
   };
 
-
-
-  handleSubmit = event => {
+  handleSubmit = (event, app) => {
+    event.persist();
     event.preventDefault();
 
-    if (event.target.innerHTML === 'Signup') {
+    console.log('submit login', app);
+
+    if (app === 'SIGNUP') {
       if (this.myRefCode.current.props.value !== '123456') {
         //en attendant
 
@@ -130,22 +127,10 @@ class AuthForm extends React.Component {
         this.myRefPwd.current.props.value ===
           this.myRefConfirmPwd.current.props.value
       ) {
-        // local storage
-        // const storage = {
-        //   user: this.state.user,
-        //   email: this.state.email,
-        //   pwd: aes256.encrypt(this.keyAes, this.state.pwd),
-        //   rememberMe: this.state.rememberMe,
-        //   validate: aes256.encrypt(
-        //     this.keyAes,
-        //     this.dateConnect.getDate().toString() +
-        //       this.dateConnect.getMonth().toString() +
-        //       this.dateConnect.getFullYear().toString(),
-        //   ),
-        // };
+        
 
-// j envoi le model objet storage que la fonction rempli est je retourne sont contenu dans l objet storage local a la fonction
-this.storage = this.writeValueLocalStorage(this.state, this.storage)
+        // j envoi le model objet storage que la fonction rempli est je retourne sont contenu dans l objet storage local a la fonction
+        this.storage = this.writeValueLocalStorage(this.state, this.storage);
 
         this.saveLocalStorage(this.storage);
 
@@ -158,76 +143,61 @@ this.storage = this.writeValueLocalStorage(this.state, this.storage)
       }
     }
 
-
-
-    if (event.target.innerHTML === 'Login') {
-
-      console.log('login ok');
-//  const storage avant test function writevaluelocalstorage
+    if (app === 'LOGIN') {
+      //  const storage avant test function writevaluelocalstorage
 
       const readStorage = this.readLocalStorage();
 
       if (readStorage !== null) {
         const resEmail = Verify.email(this.myRefEmail.current);
         const resPwd = Verify.password(this.myRefPwd.current);
-        if (!resEmail.err && !resPwd.err) {
-          console.log('res');
+        console.log('res', resEmail, resPwd);
 
+        if (!resEmail.err && !resPwd.err) {
+          console.log('comparaison email ',readStorage.email, this.myRefEmail.current.props.value)
+          console.log('comparaison pwd ',aes256.decrypt(this.keyAes, readStorage.pwd),readStorage.pwd, this.myRefPwd.current.props.value)
           if (
+            
             readStorage.email === this.myRefEmail.current.props.value &&
             aes256.decrypt(this.keyAes, readStorage.pwd) ===
               this.myRefPwd.current.props.value
           ) {
             console.log('equ');
 
-            // storage.user = readStorage.user;
-            // storage.email = readStorage.email;
-            // storage.pwd = readStorage.pwd;
-            // storage.rememberMe = readStorage.rememberMe;
-            // storage.validate = aes256.encrypt(
-            //   this.keyAes,
-            //   this.dateConnect.getDate().toString() +
-            //     this.dateConnect.getMonth().toString() +
-            //     this.dateConnect.getFullYear().toString(),
-            // );
-
-            // j envoi le model objet storage que la fonction rempli est je retourne sont contenu dans l objet storage local a la fonction
-            this.storage = this.writeValueLocalStorage(readStorage, this.storage)
-
-            this.saveLocalStorage(this.storage);
-
+            
             this.setState({ submited: true });
             return;
           } else {
+            console.log('saisie non equ localstorage');
             // saisie ne correspond pas au localStorage
             // on va verifier dans la base sql
             this.arrayParams = []; //on vide
-            this.arrayParams.push('all', `${this.myRefEmail.current.props.value}`);
+            this.arrayParams.push(
+              'all',
+              `${this.myRefEmail.current.props.value}`,
+            );
 
+            // le retour est un array [err= true ou false, data={}]
 
-// le retour est un array [err= true ou false, data={}]
+            this.callApiRequest('Login', this.storage, this.arrayParams).then(
+              responseAPI => {
+                if (!responseAPI[0]) {
+                  // j envoi le model objet storage que la fonction rempli est je retourne sont contenu dans l objet storage local a la fonction
+                  console.log('responseAPI', responseAPI);
 
-            this.callApiRequest(
-              'Login',
-              this.storage,
-              this.arrayParams
-            ).then((responseAPI)=>{
-              if (!responseAPI[0]){
-                // j envoi le model objet storage que la fonction rempli est je retourne sont contenu dans l objet storage local a la fonction
-                console.log('responseAPI', responseAPI);
-              
-              this.storage = this.writeValueLocalStorage(responseAPI[1], this.storage)
-  
-              console.log('response storage api', this.storage);
-  
-                this.saveLocalStorage(this.storage);
-  
-                this.setState({ submited: true });
-              }
-  
+                  this.storage = this.writeValueLocalStorage(
+                    responseAPI[1],
+                    this.storage,
+                  );
 
-            });
-            
+                  console.log('response storage api', this.storage);
+
+                  this.saveLocalStorage(this.storage);
+
+                  this.setState({ submited: true });
+                }
+              },
+            );
           }
         } else {
           // saisies non valides
@@ -242,7 +212,7 @@ this.storage = this.writeValueLocalStorage(this.state, this.storage)
 
   async callApiRequest(dest, storage, params) {
     var arrayData = [];
-    var respDataArr = []
+    var respDataArr = [];
 
     if (dest === 'Signup') {
       var respData = await CallApi.AxiosApi(dest, storage, params);
@@ -254,44 +224,44 @@ this.storage = this.writeValueLocalStorage(this.state, this.storage)
     }
 
     if (dest === 'Login') {
-     
-        var respData = await CallApi.AxiosApiGet(dest, storage, params);
-        console.log('retour express',respData);
-   return new Promise(resolve => {
+      var respData = await CallApi.AxiosApiGet(dest, storage, params);
+      console.log('retour express', respData);
+      return new Promise(resolve => {
         // les key ne sont pas nomees de la meme facon que le state ou storage obj
         // alors on renomme
-        
-        respDataArr.push(respData)
-        console.log('respdataarr',respDataArr)
-        respDataArr = respDataArr.map(function(obj) { 
-          console.log('map',obj['nom'], obj['user'] = obj['nom'],'hhh',obj)
-          obj['user'] = obj['nom']; // Assign new key 
-          delete obj['nom']; // Delete old key 
-          obj['pwd'] = obj['MdP']; // Assign new key 
-          delete obj['MdP']; // Delete old key 
-          obj['level'] = obj['idLevel']; // Assign new key 
-          delete obj['idLevel']; // Delete old key 
+
+        respDataArr.push(respData);
+        console.log('respdataarr', respDataArr);
+        respDataArr = respDataArr.map(function (obj) {
+          console.log(
+            'map',
+            obj['nom'],
+            (obj['user'] = obj['nom']),
+            'hhh',
+            obj,
+          );
+          obj['user'] = obj['nom']; // Assign new key
+          delete obj['nom']; // Delete old key
+          obj['pwd'] = obj['MdP']; // Assign new key
+          delete obj['MdP']; // Delete old key
+          obj['level'] = obj['idLevel']; // Assign new key
+          delete obj['idLevel']; // Delete old key
           return obj;
-          
-      }); 
-  
-      console.log('respdataarr00',respDataArr)
-  
+        });
+
+        console.log('respdataarr00', respDataArr);
+
         if (typeof respData === 'string') {
           arrayData = [true, respData];
         } else {
           arrayData = [false, respDataArr[0]];
-          arrayData[1].validate = this.state.validate
+          arrayData[1].validate = this.state.validate;
         }
 
-
-        console.log('respdataarr 2',arrayData)
+        console.log('respdataarr 2', arrayData);
         return resolve(arrayData);
-      })
-    
+      });
     }
-
-   
   }
 
   readLocalStorage = () => {
@@ -299,12 +269,12 @@ this.storage = this.writeValueLocalStorage(this.state, this.storage)
     return JSON.parse(getStorage);
   };
 
-  writeValueLocalStorage = (readStorage, storage)=>{
-console.log('writestorage', readStorage);
+  writeValueLocalStorage = (readStorage, storage) => {
+    console.log('writestorage', readStorage);
 
     storage.user = readStorage.user;
     storage.email = readStorage.email;
-    storage.pwd = aes256.encrypt(this.keyAes,readStorage.pwd);
+    storage.pwd = aes256.encrypt(this.keyAes, readStorage.pwd);
     storage.rememberMe = readStorage.rememberMe;
     storage.validate = aes256.encrypt(
       this.keyAes,
@@ -313,9 +283,8 @@ console.log('writestorage', readStorage);
         this.dateConnect.getFullYear().toString(),
     );
 
-    return storage
-
-  }
+    return storage;
+  };
 
   saveLocalStorage = storage => {
     localStorage.setItem('userActif', JSON.stringify(storage));
@@ -373,9 +342,10 @@ console.log('writestorage', readStorage);
 
     return (
       <Fragment>
-        {this.state.submited && <Redirect to="/" />}
+        {/* {this.state.submited && <Redirect to="/" />} */}
+        {this.state.submited && this.props.callBackAuth(true) }
 
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={e => this.handleSubmit(e, this.props.authState)}>
           {showLogo && (
             <div className="text-center pb-4">
               <img
