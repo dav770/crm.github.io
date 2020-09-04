@@ -207,6 +207,22 @@ app.get('/agents', (req, res) => {
   });
 });
 
+
+
+app.post('/agents', (req, res) => {
+  const table = 'agents';
+  connection.query(`select  *  from ${table}`, (err, rows) => {
+    // console.log('retour sql 2', err, rows);
+
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(rows);
+      // res.send(rows);
+    }
+  });
+});
+
 // app.get('/clients', (req, res) => {
 //   const table = 'client';
 //   connection.query(`select  *  from ${table} where idClient =3 or idClient = 7`, (err, rows) => {
